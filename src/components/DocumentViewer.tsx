@@ -11,8 +11,7 @@ import {
   Lock,
   FileText,
   Activity,
-  ChevronRight,
-  ExternalLink
+  Rocket
 } from 'lucide-react';
 import { WORKFLOW_SECTIONS, RAW_MARKDOWN_CONTENT } from '../data/workflowDocument';
 
@@ -83,7 +82,7 @@ export const DocumentViewer: React.FC = () => {
           <input
             id="doc-search-input"
             type="text"
-            placeholder="Buscar reglas, comandos, nomenclaturas o soluciones de conflicto..."
+            placeholder="Buscar en el documento (develop, main, rebase, hotfix, PR)..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
@@ -144,13 +143,13 @@ export const DocumentViewer: React.FC = () => {
         {/* Header Document Banner */}
         <div className="pt-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-800 text-emerald-400 text-xs font-semibold mb-3">
-            <BookOpen className="w-3.5 h-3.5" /> Protocolo Oficial del Repositorio
+            <BookOpen className="w-3.5 h-3.5" /> Protocolo Oficial: develop &amp; main
           </div>
           <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Guía de Git para Equipos de Alto Rendimiento
+            Guía de Git para Equipos (Estrategia develop / main)
           </h1>
           <p className="text-slate-400 text-sm sm:text-base mt-2 max-w-3xl leading-relaxed">
-            Estrategia de ramas efímeras, eliminación de commits de merge innecesarios, rebase preventivo y resolución segura de conflictos.
+            Integración continua en <strong className="text-emerald-400">develop</strong>, sincronización limpia con <strong>rebase</strong> y despliegue a producción en <strong className="text-indigo-400">main</strong> únicamente tras pruebas exitosas.
           </p>
         </div>
 
@@ -168,44 +167,44 @@ export const DocumentViewer: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5">
                 <h3 className="text-rose-400 font-bold text-sm mb-3 flex items-center gap-2">
-                  ❌ ¿Por qué se rompía el flujo antes?
+                  ❌ ¿Por qué se producían conflictos antes?
                 </h3>
                 <ul className="space-y-2 text-xs sm:text-sm text-slate-300">
                   <li className="flex items-start gap-2">
                     <span className="text-rose-500 font-bold">•</span>
-                    <span><strong>Ramas de semanas sin actualizar:</strong> Desviación masiva respecto a <code>main</code>.</span>
+                    <span><strong>Ramas desincronizadas:</strong> Desarrollar días sin hacer rebase contra <code>develop</code>.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-rose-500 font-bold">•</span>
-                    <span><strong>Uso de <code>git pull</code> tradicional:</strong> Genera commits tipo <em>"Merge branch 'main' of..."</em> que ensucian el historial.</span>
+                    <span><strong>Uso de <code>git pull</code> con merge:</strong> Genera commits redundantes tipo <em>"Merge branch 'develop' of..."</em>.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-rose-500 font-bold">•</span>
-                    <span><strong>Commits masivos:</strong> Dificultad para revisar y revertir bugs aislados.</span>
+                    <span><strong>Falta de separación de entornos:</strong> Mezclar código en desarrollo directamente en producción.</span>
                   </li>
                 </ul>
               </div>
 
               <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5">
                 <h3 className="text-emerald-400 font-bold text-sm mb-3 flex items-center gap-2">
-                  ✅ Los 4 Principios de la Nueva Estrategia
+                  ✅ Los 4 Principios de la Estrategia
                 </h3>
                 <ul className="space-y-2 text-xs sm:text-sm text-slate-300">
                   <li className="flex items-start gap-2">
                     <span className="text-emerald-400 font-bold">1.</span>
-                    <span><strong>Ramas de vida corta:</strong> Máximo 1 a 3 días de duración por rama.</span>
+                    <span><strong><code>develop</code> es el epicentro de trabajo:</strong> Todas las features nacen y mueren en <code>develop</code>.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-emerald-400 font-bold">2.</span>
-                    <span><strong>Historial lineal con Rebase:</strong> Sin ramas cruzadas ni merges fantasmas.</span>
+                    <span><strong><code>main</code> es Producción Probada:</strong> Solo recibe código validado desde <code>develop</code> o <code>hotfix/*</code>.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-emerald-400 font-bold">3.</span>
-                    <span><strong>La rama <code>main</code> es sagrada:</strong> Siempre desplegable y protegida.</span>
+                    <span><strong>Rebase obligatorio:</strong> Sincronización limpia antes de abrir PR.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-emerald-400 font-bold">4.</span>
-                    <span><strong>Pull Request obligatorio:</strong> Mínimo 1 aprobación para integrar código.</span>
+                    <span><strong>Revisión obligatoria:</strong> Mínimo 1 aprobación en Pull Request.</span>
                   </li>
                 </ul>
               </div>
@@ -219,13 +218,13 @@ export const DocumentViewer: React.FC = () => {
             <div className="flex items-center justify-between">
               <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
                 <GitBranch className="w-5 h-5 text-emerald-400" />
-                2. Estrategia de Ramas y Nomenclatura
+                2. Estrategia develop / main y Nomenclatura
               </h2>
-              <span className="text-xs px-2.5 py-1 rounded bg-emerald-950 text-emerald-300 font-semibold">Convención</span>
+              <span className="text-xs px-2.5 py-1 rounded bg-emerald-950 text-emerald-300 font-semibold">Arquitectura</span>
             </div>
 
             <p className="text-sm text-slate-300 leading-relaxed">
-              Adoptamos una arquitectura <strong>Trunk-Based modificada con ramas efímeras</strong>. La rama principal es <code>main</code> y todas las ramas de trabajo nacen y mueren tras fusionarse a través de un Pull Request con <em>Squash and Merge</em>.
+              El equipo utiliza dos ramas principales protegidas: <strong className="text-emerald-400">develop</strong> (integración diaria y pruebas) y <strong className="text-indigo-400">main</strong> (producción estable).
             </p>
 
             {/* Table of branch prefixes */}
@@ -234,40 +233,47 @@ export const DocumentViewer: React.FC = () => {
                 <thead className="bg-slate-950 text-slate-300 font-semibold uppercase text-[11px] border-b border-slate-800">
                   <tr>
                     <th className="p-3.5">Prefijo</th>
+                    <th className="p-3.5">Base (Nace de)</th>
+                    <th className="p-3.5">Destino PR</th>
                     <th className="p-3.5">Propósito</th>
-                    <th className="p-3.5">Ejemplo de Nombre</th>
+                    <th className="p-3.5">Ejemplo</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800 text-slate-300 bg-slate-950/40">
                   <tr>
                     <td className="p-3.5 font-mono text-emerald-400 font-bold">feat/</td>
-                    <td className="p-3.5">Nuevas características o pantallas de usuario</td>
-                    <td className="p-3.5 font-mono text-xs text-slate-300">feat/login-google, feat/CART-10-pasarela-pago</td>
+                    <td className="p-3.5 font-mono text-xs text-indigo-300">develop</td>
+                    <td className="p-3.5 font-mono text-xs text-indigo-300">develop</td>
+                    <td className="p-3.5">Nuevas funcionalidades o vistas</td>
+                    <td className="p-3.5 font-mono text-xs text-slate-300">feat/login-google</td>
                   </tr>
                   <tr>
                     <td className="p-3.5 font-mono text-rose-400 font-bold">fix/</td>
-                    <td className="p-3.5">Corrección de errores o bugs en código</td>
-                    <td className="p-3.5 font-mono text-xs text-slate-300">fix/calculo-iva, fix/AUTH-40-token-invalido</td>
+                    <td className="p-3.5 font-mono text-xs text-indigo-300">develop</td>
+                    <td className="p-3.5 font-mono text-xs text-indigo-300">develop</td>
+                    <td className="p-3.5">Corrección de bugs en desarrollo</td>
+                    <td className="p-3.5 font-mono text-xs text-slate-300">fix/calculo-iva</td>
                   </tr>
                   <tr>
                     <td className="p-3.5 font-mono text-amber-400 font-bold">hotfix/</td>
-                    <td className="p-3.5">Correcciones críticas directas a producción</td>
-                    <td className="p-3.5 font-mono text-xs text-slate-300">hotfix/caida-checkout-stripe</td>
+                    <td className="p-3.5 font-mono text-xs text-emerald-300">main</td>
+                    <td className="p-3.5 font-mono text-xs text-emerald-300">main &amp; develop</td>
+                    <td className="p-3.5">Arreglos urgentes en producción</td>
+                    <td className="p-3.5 font-mono text-xs text-slate-300">hotfix/caida-pago</td>
                   </tr>
                   <tr>
                     <td className="p-3.5 font-mono text-indigo-400 font-bold">refactor/</td>
-                    <td className="p-3.5">Mejora de arquitectura o limpieza sin cambiar comportamiento</td>
-                    <td className="p-3.5 font-mono text-xs text-slate-300">refactor/modularizar-servicios-auth</td>
+                    <td className="p-3.5 font-mono text-xs text-indigo-300">develop</td>
+                    <td className="p-3.5 font-mono text-xs text-indigo-300">develop</td>
+                    <td className="p-3.5">Limpieza de código sin cambiar función</td>
+                    <td className="p-3.5 font-mono text-xs text-slate-300">refactor/auth-api</td>
                   </tr>
                   <tr>
                     <td className="p-3.5 font-mono text-cyan-400 font-bold">chore/</td>
-                    <td className="p-3.5">Actualización de dependencias, configs, linter o CI/CD</td>
-                    <td className="p-3.5 font-mono text-xs text-slate-300">chore/actualizar-vite-v6</td>
-                  </tr>
-                  <tr>
-                    <td className="p-3.5 font-mono text-purple-400 font-bold">docs/</td>
-                    <td className="p-3.5">Modificaciones únicamente en documentación o README</td>
-                    <td className="p-3.5 font-mono text-xs text-slate-300">docs/actualizar-guia-instalacion</td>
+                    <td className="p-3.5 font-mono text-xs text-indigo-300">develop</td>
+                    <td className="p-3.5 font-mono text-xs text-indigo-300">develop</td>
+                    <td className="p-3.5">Dependencias, linter, builds o CI/CD</td>
+                    <td className="p-3.5 font-mono text-xs text-slate-300">chore/update-vite</td>
                   </tr>
                 </tbody>
               </table>
@@ -281,7 +287,7 @@ export const DocumentViewer: React.FC = () => {
             <div className="flex items-center justify-between">
               <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
                 <Terminal className="w-5 h-5 text-amber-400" />
-                3. Ciclo de Vida Diario Paso a Paso
+                3. Ciclo de Vida Diario Paso a Paso (en develop)
               </h2>
               <span className="text-xs px-2.5 py-1 rounded bg-amber-950 text-amber-300 font-semibold">Comandos</span>
             </div>
@@ -290,11 +296,8 @@ export const DocumentViewer: React.FC = () => {
             <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5">
               <div className="flex items-center gap-2 font-bold text-sm text-white mb-2">
                 <span className="w-5 h-5 rounded bg-amber-600 text-white text-xs flex items-center justify-center font-mono">0</span>
-                Configuración Inicial Obligatoria (Una sola vez en tu equipo)
+                Configuración Inicial Obligatoria (Una sola vez)
               </div>
-              <p className="text-xs text-slate-400 mb-3">
-                Esto asegura que cada vez que hagas <code>git pull</code>, Git use <code>rebase</code> de forma nativa sin generar commits basura.
-              </p>
               <CodeSnippet
                 id="cmd-step-0"
                 code={`git config --global pull.rebase true\ngit config --global fetch.prune true\ngit config --global rebase.autoStash true`}
@@ -304,67 +307,104 @@ export const DocumentViewer: React.FC = () => {
             {/* Steps Timeline */}
             <div className="space-y-4">
               <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800">
-                <h4 className="font-bold text-white text-sm mb-1">Paso 1: Iniciar nueva tarea desde main actualizado</h4>
-                <p className="text-xs text-slate-400 mb-2">Nunca inicies una tarea desde una rama vieja o desactualizada.</p>
+                <h4 className="font-bold text-white text-sm mb-1">Paso 1: Iniciar tarea desde develop fresco</h4>
                 <CodeSnippet
                   id="cmd-step-1"
-                  code={`git checkout main\ngit pull origin main\ngit checkout -b feat/registro-usuarios`}
+                  code={`git checkout develop\ngit pull origin develop\ngit checkout -b feat/registro-usuarios`}
                 />
               </div>
 
               <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800">
                 <h4 className="font-bold text-white text-sm mb-1">Paso 2: Desarrollar con commits atómicos</h4>
-                <p className="text-xs text-slate-400 mb-2">Guarda progresivamente tus cambios con Conventional Commits (feat, fix, refactor, test, chore).</p>
                 <CodeSnippet
                   id="cmd-step-2"
-                  code={`git add src/features/auth/register.tsx\ngit commit -m "feat(auth): agregar validacion de contrasena segura en registro"`}
+                  code={`git add src/features/auth/register.tsx\ngit commit -m "feat(auth): agregar validacion de contrasena segura"`}
                 />
               </div>
 
               <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800">
-                <h4 className="font-bold text-white text-sm mb-1">Paso 3: Sincronizarte con lo nuevo de main usando Rebase</h4>
-                <p className="text-xs text-slate-400 mb-2">⚠️ REGLA: Nunca uses <code>git merge main</code>. Usa <code>rebase</code> para mantener el árbol recto.</p>
+                <h4 className="font-bold text-white text-sm mb-1">Paso 3: Sincronizarte con develop usando Rebase</h4>
                 <CodeSnippet
                   id="cmd-step-3"
-                  code={`git fetch origin main\ngit rebase origin/main`}
+                  code={`git fetch origin develop\ngit rebase origin/develop`}
                 />
               </div>
 
               <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800">
-                <h4 className="font-bold text-white text-sm mb-1">Paso 4: Subir tu rama y abrir Pull Request</h4>
-                <p className="text-xs text-slate-400 mb-2">Usa <code>--force-with-lease</code> si ya habías subido la rama y realizaste un rebase.</p>
+                <h4 className="font-bold text-white text-sm mb-1">Paso 4: Subir tu rama y abrir PR hacia develop</h4>
                 <CodeSnippet
                   id="cmd-step-4"
-                  code={`# Primera vez que la subes:\ngit push -u origin feat/registro-usuarios\n\n# Si ya existía en remoto y le hiciste rebase:\ngit push --force-with-lease origin feat/registro-usuarios`}
+                  code={`# Primera vez:\ngit push -u origin feat/registro-usuarios\n\n# Si ya existía y le hiciste rebase:\ngit push --force-with-lease origin feat/registro-usuarios`}
                 />
               </div>
 
               <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800">
-                <h4 className="font-bold text-white text-sm mb-1">Paso 5: Fusión (Squash & Merge) y Limpieza</h4>
-                <p className="text-xs text-slate-400 mb-2">Tras la aprobación del PR en GitHub/GitLab, limpia tu rama local.</p>
+                <h4 className="font-bold text-white text-sm mb-1">Paso 5: Fusión en develop y Limpieza</h4>
                 <CodeSnippet
                   id="cmd-step-5"
-                  code={`git checkout main\ngit pull origin main\ngit branch -d feat/registro-usuarios`}
+                  code={`git checkout develop\ngit pull origin develop\ngit branch -d feat/registro-usuarios`}
                 />
               </div>
             </div>
           </section>
         )}
 
-        {/* Section 4 */}
+        {/* Section 4: Producción y Releases */}
+        {(selectedSection === 'all' || selectedSection === 'produccion') && (
+          <section id="section-produccion" className="pt-10 space-y-5">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                <Rocket className="w-5 h-5 text-indigo-400" />
+                4. Paso a Producción (develop ➔ main) y Hotfixes
+              </h2>
+              <span className="text-xs px-2.5 py-1 rounded bg-indigo-950 text-indigo-300 font-semibold">Releases</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5">
+                <h3 className="font-bold text-sm text-emerald-400 mb-2">🚀 Paso a Producción (Release)</h3>
+                <p className="text-xs text-slate-300 mb-3">
+                  Cuando todas las tareas en <code>develop</code> han sido probadas en staging:
+                </p>
+                <ol className="text-xs text-slate-300 space-y-1.5 list-decimal pl-4">
+                  <li>Se abre Pull Request de <strong><code>develop</code> hacia <code>main</code></strong>.</li>
+                  <li>Se aprueba y se fusiona en <code>main</code>.</li>
+                  <li>Se etiqueta la versión en <code>main</code>:</li>
+                </ol>
+                <CodeSnippet
+                  id="cmd-release-tag"
+                  code={`git checkout main\ngit pull origin main\ngit tag -a v1.2.0 -m "Release v1.2.0: Modulo de Pagos"\ngit push origin v1.2.0`}
+                />
+              </div>
+
+              <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5">
+                <h3 className="font-bold text-sm text-rose-400 mb-2">🚨 Hotfixes Directos a Producción</h3>
+                <p className="text-xs text-slate-300 mb-3">
+                  Para bugs críticos en producción que no pueden esperar al ciclo de <code>develop</code>:
+                </p>
+                <CodeSnippet
+                  id="cmd-hotfix"
+                  code={`# 1. Crear desde main\ngit checkout main && git pull origin main\ngit checkout -b hotfix/error-login-prod\n\n# 2. Corregir, subir y abrir PR hacia main\ngit commit -m "fix(prod): resolver caida de login"\ngit push -u origin hotfix/error-login-prod\n\n# 3. TRAS EL MERGE EN MAIN: Sincronizar develop\ngit checkout develop && git pull origin develop\ngit merge main\ngit push origin develop`}
+                />
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Section 5: Conflictos */}
         {(selectedSection === 'all' || selectedSection === 'conflictos') && (
           <section id="section-conflictos" className="pt-10 space-y-5">
             <div className="flex items-center justify-between">
               <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
                 <ShieldAlert className="w-5 h-5 text-rose-400" />
-                4. Protocolo de Resolución de Conflictos con Rebase
+                5. Protocolo de Resolución de Conflictos con Rebase
               </h2>
               <span className="text-xs px-2.5 py-1 rounded bg-rose-950 text-rose-300 font-semibold">Protocolo</span>
             </div>
 
             <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-4">
               <p className="text-sm text-slate-300">
-                Cuando dos desarrolladores tocan las mismas líneas, Git detiene el rebase para que decidas qué código conservar. Sigue estos 4 pasos:
+                Cuando dos desarrolladores tocan las mismas líneas en <code>develop</code>, Git detiene el rebase. Sigue estos pasos:
               </p>
 
               <div className="space-y-3 text-xs sm:text-sm">
@@ -386,7 +426,7 @@ export const DocumentViewer: React.FC = () => {
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
-                  <strong className="text-white">4. Si algo sale mal y quieres empezar de nuevo:</strong>
+                  <strong className="text-white">4. Si te equivocas y quieres abortar:</strong>
                   <CodeSnippet id="cmd-conf-4" code={`git rebase --abort`} />
                 </div>
               </div>
@@ -394,45 +434,45 @@ export const DocumentViewer: React.FC = () => {
           </section>
         )}
 
-        {/* Section 5 */}
+        {/* Section 6: Políticas */}
         {(selectedSection === 'all' || selectedSection === 'politicas') && (
           <section id="section-politicas" className="pt-10 space-y-5">
             <div className="flex items-center justify-between">
               <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
                 <Lock className="w-5 h-5 text-indigo-400" />
-                5. Políticas de Protección del Repositorio
+                6. Políticas de Protección (main &amp; develop)
               </h2>
               <span className="text-xs px-2.5 py-1 rounded bg-indigo-950 text-indigo-300 font-semibold">Seguridad</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
               <div className="p-4 rounded-xl bg-slate-950 border border-slate-800">
-                <h4 className="font-bold text-emerald-400 mb-1">🔒 Prohibido Push Directo a main</h4>
-                <p className="text-slate-400">Todo cambio debe ingresar obligatoriamente a través de un Pull Request.</p>
+                <h4 className="font-bold text-emerald-400 mb-1">🔒 Prohibido Push Directo a develop y main</h4>
+                <p className="text-slate-400">Todo cambio debe ingresar obligatoriamente a través de un Pull Request aprobado.</p>
               </div>
               <div className="p-4 rounded-xl bg-slate-950 border border-slate-800">
                 <h4 className="font-bold text-emerald-400 mb-1">👥 Mínimo 1 Aprobación Requerida</h4>
-                <p className="text-slate-400">Ningún PR se fusiona sin que un compañero lo haya revisado y aprobado.</p>
+                <p className="text-slate-400">Ningún PR se fusiona sin revisión cruzada de código.</p>
               </div>
               <div className="p-4 rounded-xl bg-slate-950 border border-slate-800">
                 <h4 className="font-bold text-emerald-400 mb-1">🔄 Require branch to be up to date</h4>
-                <p className="text-slate-400">Obliga a que la rama esté al día con <code>main</code> antes de permitir el merge.</p>
+                <p className="text-slate-400">Obliga a tener la rama al día con <code>develop</code> antes de permitir el merge.</p>
               </div>
               <div className="p-4 rounded-xl bg-slate-950 border border-slate-800">
                 <h4 className="font-bold text-emerald-400 mb-1">🧪 CI / Build Checks en Verde</h4>
-                <p className="text-slate-400">Pruebas unitarias, compilación de TypeScript y lint deben pasar sin errores.</p>
+                <p className="text-slate-400">Linters, tests y TypeScript deben compilar sin advertencias ni errores.</p>
               </div>
             </div>
           </section>
         )}
 
-        {/* Section 6 */}
+        {/* Section 7: Cheat Sheet */}
         {(selectedSection === 'all' || selectedSection === 'cheat-sheet') && (
           <section id="section-cheat-sheet" className="pt-10 space-y-5">
             <div className="flex items-center justify-between">
               <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
                 <FileText className="w-5 h-5 text-cyan-400" />
-                6. Cheat Sheet & 5 Reglas de Oro
+                7. Cheat Sheet &amp; 5 Reglas de Oro
               </h2>
               <span className="text-xs px-2.5 py-1 rounded bg-cyan-950 text-cyan-300 font-semibold">Referencia</span>
             </div>
@@ -442,23 +482,23 @@ export const DocumentViewer: React.FC = () => {
                 🌟 Las 5 Reglas Inquebrantables del Equipo
               </h4>
               <ol className="space-y-2 text-xs sm:text-sm text-slate-200">
-                <li><strong>1. Nunca trabajes directamente en <code>main</code>.</strong></li>
-                <li><strong>2. No hagas <code>git merge main</code> en tu rama local; usa siempre <code>git rebase origin/main</code>.</strong></li>
-                <li><strong>3. Haz <code>fetch/pull</code> antes de empezar a programar y antes de abrir tu PR.</strong></li>
-                <li><strong>4. Avisa al equipo antes de modificar configuraciones o dependencias globales.</strong></li>
+                <li><strong>1. Nadie programa directamente en <code>main</code> ni en <code>develop</code>.</strong></li>
+                <li><strong>2. Las ramas de trabajo nacen de <code>develop</code> y abren PR hacia <code>develop</code>.</strong></li>
+                <li><strong>3. No hagas <code>git merge develop</code> en local; usa siempre <code>git rebase origin/develop</code>.</strong></li>
+                <li><strong>4. <code>main</code> solo recibe código probado mediante Release PR desde <code>develop</code> o <code>hotfix/*</code>.</strong></li>
                 <li><strong>5. Revisa los Pull Requests de tus compañeros en menos de 24 horas.</strong></li>
               </ol>
             </div>
           </section>
         )}
 
-        {/* Section 7 */}
+        {/* Section 8: Caso Práctico */}
         {(selectedSection === 'all' || selectedSection === 'caso-practico') && (
           <section id="section-caso-practico" className="pt-10 space-y-5">
             <div className="flex items-center justify-between">
               <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
                 <Terminal className="w-5 h-5 text-emerald-400" />
-                7. Caso Práctico Completo: Carlos y Ana
+                8. Caso Práctico Completo: Carlos y Ana (develop ➔ main)
               </h2>
               <span className="text-xs px-2.5 py-1 rounded bg-emerald-950 text-emerald-300 font-semibold">Ejemplo Real</span>
             </div>
@@ -467,14 +507,14 @@ export const DocumentViewer: React.FC = () => {
               <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
                 <p className="font-bold text-white mb-1">📖 Contexto del caso:</p>
                 <p>
-                  Carlos inicia la tarea de agregar el <strong>Botón de Logout</strong>. Mientras programa, Ana sube a <code>main</code> cambios en el mismo archivo <code>Navbar.tsx</code> (agregó el Avatar de usuario).
+                  Carlos inicia la tarea del <strong>Botón de Logout</strong> creando su rama desde <code>develop</code>. Mientras programa, Ana sube a <code>develop</code> el Avatar de usuario en <code>Navbar.tsx</code>. Carlos resuelve el conflicto con rebase, fusiona en <code>develop</code> y posteriormente el equipo hace el Release a <code>main</code>.
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <span className="font-semibold text-emerald-400">1. Carlos crea su rama desde main limpio:</span>
-                  <CodeSnippet id="case-1" code={`git checkout main && git pull origin main\ngit checkout -b feat/boton-logout`} />
+                  <span className="font-semibold text-emerald-400">1. Carlos crea su rama desde develop limpio:</span>
+                  <CodeSnippet id="case-1" code={`git checkout develop && git pull origin develop\ngit checkout -b feat/boton-logout`} />
                 </div>
 
                 <div>
@@ -483,8 +523,8 @@ export const DocumentViewer: React.FC = () => {
                 </div>
 
                 <div>
-                  <span className="font-semibold text-emerald-400">3. Carlos se sincroniza con lo nuevo que subió Ana a main:</span>
-                  <CodeSnippet id="case-3" code={`git fetch origin main\ngit rebase origin/main`} />
+                  <span className="font-semibold text-emerald-400">3. Carlos se sincroniza con lo nuevo que subió Ana a develop:</span>
+                  <CodeSnippet id="case-3" code={`git fetch origin develop\ngit rebase origin/develop`} />
                 </div>
 
                 <div>
@@ -492,7 +532,7 @@ export const DocumentViewer: React.FC = () => {
                   <CodeSnippet
                     id="case-4"
                     language="tsx"
-                    code={`<<<<<<< HEAD (Avatar de Ana en main)\n<img src="/avatar-ana.png" alt="Perfil" className="w-8 h-8 rounded-full" />\n=======\n<button onClick={handleLogout} className="bg-rose-600 px-3 py-1 rounded">Logout</button>\n>>>>>>> feat(nav): agregar boton de logout`}
+                    code={`<<<<<<< HEAD (Avatar de Ana en develop)\n<img src="/avatar-ana.png" alt="Perfil" className="w-8 h-8 rounded-full" />\n=======\n<button onClick={handleLogout} className="bg-rose-600 px-3 py-1 rounded">Logout</button>\n>>>>>>> feat(nav): agregar boton de logout`}
                   />
                 </div>
 
@@ -500,12 +540,20 @@ export const DocumentViewer: React.FC = () => {
                   <span className="font-semibold text-emerald-400">5. Carlos une ambos cambios y continúa el rebase:</span>
                   <CodeSnippet
                     id="case-5"
-                    code={`# Carlos edita Navbar.tsx dejando tanto el avatar como el boton\ngit add src/components/Navbar.tsx\ngit rebase --continue\n\n# Carlos sube su rama lista para el PR:\ngit push -u origin feat/boton-logout`}
+                    code={`# Carlos edita Navbar.tsx dejando tanto el avatar como el boton\ngit add src/components/Navbar.tsx\ngit rebase --continue\n\n# Carlos sube su rama y abre PR hacia develop:\ngit push -u origin feat/boton-logout`}
+                  />
+                </div>
+
+                <div>
+                  <span className="font-semibold text-emerald-400">6. Pase a Producción en main:</span>
+                  <CodeSnippet
+                    id="case-6"
+                    code={`# Una vez probado develop en staging, se abre PR de develop a main\ngit checkout main && git pull origin main\ngit tag -a v1.1.0 -m "Release v1.1.0: Navbar con logout y avatar"\ngit push origin v1.1.0`}
                   />
                 </div>
 
                 <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-800 text-emerald-300">
-                  ✅ <strong>Resultado:</strong> Ana aprueba el PR de Carlos, se hace <em>Squash & Merge</em> y el historial de <code>main</code> se mantiene 100% lineal sin un solo commit de merge basura.
+                  ✅ <strong>Resultado:</strong> <code>develop</code> recibe todas las features de forma continua y limpia con rebase, mientras que <code>main</code> se mantiene 100% estable con versiones probadas.
                 </div>
               </div>
             </div>

@@ -14,12 +14,14 @@ export const CommandGenerator: React.FC = () => {
     ? `${branchType}/${ticketId.trim().toUpperCase()}-${cleanDesc}`
     : `${branchType}/${cleanDesc}`;
 
+  const baseBranch = branchType === 'hotfix' ? 'main' : 'develop';
+
   const steps = [
     {
       step: 1,
-      title: "Actualizar main y crear rama limpia",
-      comment: "Asegura que inicias con la versión más reciente del equipo",
-      command: `git checkout main && git pull origin main && git checkout -b ${branchName}`
+      title: `Actualizar ${baseBranch} y crear rama limpia`,
+      comment: `Nace de ${baseBranch} con la versión más reciente del equipo`,
+      command: `git checkout ${baseBranch} && git pull origin ${baseBranch} && git checkout -b ${branchName}`
     },
     {
       step: 2,
@@ -29,21 +31,21 @@ export const CommandGenerator: React.FC = () => {
     },
     {
       step: 3,
-      title: "Sincronizarse con lo nuevo de main (Rebase)",
-      comment: "Ejecuta esto antes de subir para evitar conflictos en el PR",
-      command: `git fetch origin main && git rebase origin/main`
+      title: `Sincronizarse con lo nuevo de ${baseBranch} (Rebase)`,
+      comment: `Ejecuta esto antes de subir para evitar conflictos en ${baseBranch}`,
+      command: `git fetch origin ${baseBranch} && git rebase origin/${baseBranch}`
     },
     {
       step: 4,
-      title: "Publicar tu rama en el repositorio remoto",
+      title: `Publicar tu rama y abrir PR hacia ${baseBranch}`,
       comment: "Usa -u la primera vez o --force-with-lease si hiciste rebase",
       command: `git push -u origin ${branchName}`
     },
     {
       step: 5,
-      title: "Limpieza tras el merge del Pull Request",
-      comment: "Regresa a main y borra la rama que ya fue integrada",
-      command: `git checkout main && git pull origin main && git branch -d ${branchName}`
+      title: `Limpieza tras el merge del Pull Request en ${baseBranch}`,
+      comment: `Regresa a ${baseBranch} y borra la rama que ya fue integrada`,
+      command: `git checkout ${baseBranch} && git pull origin ${baseBranch} && git branch -d ${branchName}`
     }
   ];
 
@@ -66,13 +68,13 @@ export const CommandGenerator: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 text-emerald-400 font-semibold text-sm tracking-wide uppercase">
             <Sparkles className="w-4 h-4" />
-            Herramienta Interactiva del Equipo
+            Herramienta Interactiva del Equipo (develop ➔ main)
           </div>
           <h3 className="text-xl sm:text-2xl font-bold text-white mt-1">
             Generador de Comandos para tu Tarea
           </h3>
           <p className="text-slate-400 text-sm mt-1">
-            Ingresa los detalles de tu tarea y obtén la secuencia exacta de comandos lista para copiar a tu terminal.
+            Genera automáticamente los comandos basados en <strong className="text-emerald-300">develop</strong> (o <strong className="text-rose-300">main</strong> para hotfixes).
           </p>
         </div>
 
@@ -98,12 +100,12 @@ export const CommandGenerator: React.FC = () => {
             onChange={(e) => setBranchType(e.target.value)}
             className="w-full bg-slate-800/90 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
           >
-            <option value="feat">feat (Nueva funcionalidad)</option>
-            <option value="fix">fix (Corrección de bug)</option>
-            <option value="hotfix">hotfix (Emergencia producción)</option>
-            <option value="refactor">refactor (Refactorización)</option>
-            <option value="chore">chore (Mantenimiento/Deps)</option>
-            <option value="docs">docs (Documentación)</option>
+            <option value="feat">feat (Nueva funcionalidad ➔ develop)</option>
+            <option value="fix">fix (Corrección de bug ➔ develop)</option>
+            <option value="refactor">refactor (Refactorización ➔ develop)</option>
+            <option value="chore">chore (Mantenimiento ➔ develop)</option>
+            <option value="hotfix">hotfix (Emergencia producción ➔ main)</option>
+            <option value="docs">docs (Documentación ➔ develop)</option>
           </select>
         </div>
 
@@ -151,16 +153,21 @@ export const CommandGenerator: React.FC = () => {
       </div>
 
       {/* Generated Branch Badge */}
-      <div className="mt-5 p-3 rounded-lg bg-slate-800/60 border border-slate-700/80 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-xs text-slate-300">
-          <span className="text-slate-400">Nombre de rama resultante:</span>
+      <div className="mt-5 p-3.5 rounded-lg bg-slate-800/60 border border-slate-700/80 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
+          <span className="text-slate-400">Rama:</span>
           <code className="bg-slate-900 px-2.5 py-1 rounded text-emerald-400 font-mono font-semibold text-xs sm:text-sm">
             {branchName}
           </code>
+          <span className="text-slate-500">|</span>
+          <span className="text-slate-400">Base / Destino del PR:</span>
+          <span className="bg-indigo-950 text-indigo-300 font-mono px-2 py-0.5 rounded text-xs font-semibold">
+            {baseBranch}
+          </span>
         </div>
         <div className="flex items-center gap-1.5 text-xs text-emerald-400">
           <ShieldCheck className="w-4 h-4" />
-          <span>Convención estándar validada</span>
+          <span>Estrategia Validada</span>
         </div>
       </div>
 

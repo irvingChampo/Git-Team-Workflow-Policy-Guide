@@ -1,63 +1,65 @@
 # 📘 Guía Oficial y Protocolo de Git para el Equipo
-## Estrategia de Ramas, Reglas de Trabajo, Sincronización y Resolución de Conflictos
+## Estrategia de Ramas (develop/main), Reglas de Trabajo, Sincronización y Resolución de Conflictos
 
 ---
 
 ## 📑 Tabla de Contenidos
 1. [Diagnóstico y Filosofía de Trabajo](#1-diagnóstico-y-filosofía-de-trabajo)
-2. [Estrategia de Ramas y Nomenclatura](#2-estrategia-de-ramas-y-nomenclatura)
+2. [Estrategia de Ramas (develop y main) y Nomenclatura](#2-estrategia-de-ramas-develop-y-main-y-nomenclatura)
 3. [Ciclo de Vida Diario Paso a Paso](#3-ciclo-de-vida-diario-paso-a-paso)
-4. [Protocolo de Resolución de Conflictos con Rebase](#4-protocolo-de-resolución-de-conflictos-con-rebase)
-5. [Políticas de Protección del Repositorio](#5-políticas-de-protección-del-repositorio)
-6. [Hoja de Referencia Rápida (Cheat Sheet)](#6-hoja-de-referencia-rápida-cheat-sheet)
-7. [Caso Práctico Completo de Principio a Fin](#7-caso-práctico-completo-de-principio-a-fin)
+4. [Paso a Producción: De develop a main y Hotfixes](#4-paso-a-producción-de-develop-a-main-y-hotfixes)
+5. [Protocolo de Resolución de Conflictos con Rebase](#5-protocolo-de-resolución-de-conflictos-con-rebase)
+6. [Políticas de Protección del Repositorio](#6-políticas-de-protección-del-repositorio)
+7. [Hoja de Referencia Rápida (Cheat Sheet)](#7-hoja-de-referencia-rápida-cheat-sheet)
+8. [Caso Práctico Completo de Principio a Fin](#8-caso-práctico-completo-de-principio-a-fin)
 
 ---
 
 ## 1. Diagnóstico y Filosofía de Trabajo
 
 ### 1.1. Las Causas Principales de los Conflictos y Desorden
-* **Ramas de larga duración (*Long-lived branches*)**: Mantener una rama abierta por semanas sin sincronizar con `main` provoca divergencias masivas en el código.
-* **Uso de `git pull` tradicional (Merge por defecto)**: Por defecto, `git pull` realiza un merge commit automático que genera commits del tipo *"Merge branch 'main' of..."*, ensuciando el árbol de Git.
+* **Ramas de larga duración (*Long-lived branches*)**: Mantener una rama abierta por semanas sin sincronizar con `develop` provoca divergencias masivas en el código.
+* **Uso de `git pull` tradicional (Merge por defecto)**: Por defecto, `git pull` realiza un merge commit automático que genera commits del tipo *"Merge branch 'develop' of..."*, ensuciando el árbol de Git.
 * **Commits masivos y desordenados**: Subir decenas de archivos modificados en un solo commit impide revisiones efectivas y dificulta aislar bugs.
-* **Trabajo en archivos compartidos sin comunicación**: Tocar archivos transversales (rutas, configuraciones globales, migraciones) sin avisar al equipo.
+* **Falta de separación entre Desarrollo y Producción**: Mezclar código experimental o en pruebas directamente en la rama productiva.
 
 ### 1.2. Principios de Oro del Repositorio
-* 🛡️ **La rama `main` es sagrada**: Siempre debe compilar, tener tests pasando y estar lista para desplegarse a producción. Nadie hace `commit` ni `push` directo a `main`.
+* 🧪 **`develop` es el centro de integración**: Todas las ramas de tareas (`feat/`, `fix/`, `refactor/`) se crean a partir de `develop` y se integran mediante Pull Requests hacia `develop`.
+* 🛡️ **`main` es Producción 100% Estable**: Solo contiene versiones probadas y validadas listas para el usuario final. Nadie programa directamente sobre `main`.
 * ⚡ **Ramas efímeras**: Ninguna rama debe vivir más de 1 a 3 días. Los desarrollos grandes se dividen en entregas pequeñas (*small batch sizes*).
-* 🧼 **Historial limpio y lineal**: Se utiliza `rebase` en local antes de subir cambios para evitar ramas cruzadas y commits redundantes.
-* 👥 **Revisión obligatoria**: Ningún cambio entra a `main` sin la aprobación de al menos un revisor en Pull Request.
+* 🧼 **Historial limpio y lineal**: Se utiliza `rebase` en local contra `develop` antes de subir cambios para evitar ramas cruzadas y commits redundantes.
+* 👥 **Revisión obligatoria**: Ningún cambio entra a `develop` o `main` sin la aprobación de al menos un revisor en Pull Request.
 
 ---
 
-## 2. Estrategia de Ramas y Nomenclatura
+## 2. Estrategia de Ramas (develop y main) y Nomenclatura
 
-### 2.1. Arquitectura de Ramas (*Trunk-Based / GitHub Flow*)
+### 2.1. Arquitectura de Ramas (*GitFlow Adaptado / Two-Trunk*)
 
 ```text
-[ main ] -----------------●-----------------------●---------> (Siempre estable)
-           \             / (Squash & Merge)      /
-            ●---●---●---●                       /
-           [ feat/auth-login ]                 /
-                               \              /
-                                ●---●--------●
-                               [ fix/header-nav ]
+[ main (Producción) ] ----------------------------------------● (Release probada v1.1.0)
+                                                             / (PR de Release)
+[ develop (Pruebas) ] --------●-----------------●-----------●---------------------------->
+                               \               / (Squash PR)
+                                ●---●---●-----●
+                              [ feat/auth-login ]
 ```
 
-* **`main`**: Rama troncal y única rama de larga duración.
-* **Ramas de funcionalidad/arreglo**: Ramas efímeras que nacen de `main` y se eliminan inmediatamente tras integrarse.
+* **`main`**: Código productivo desplegado. Solo recibe código desde `develop` (Releases validadas) o desde `hotfix/*` (urgencias).
+* **`develop`**: Rama base del equipo. Todo el trabajo diario se integra aquí para testing y control de calidad (QA).
+* **Ramas de trabajo temporales**: Creadas a partir de `develop` y eliminadas inmediatamente tras fusionarse en `develop`.
 
 ### 2.2. Nomenclatura Estándar de Ramas
 Formato obligatorio: `<prefijo>/<ticket-o-descripcion-corta>` (todo en minúsculas, palabras separadas por guión medio `-`).
 
-| Prefijo | Cuándo se usa | Ejemplo |
-| :--- | :--- | :--- |
-| `feat/` | Nuevas características o pantallas | `feat/login-google`, `feat/CART-402-pasarela-pago` |
-| `fix/` | Corrección de errores en código existente | `fix/error-calculo-iva`, `fix/AUTH-105-token-expirado` |
-| `hotfix/` | Arreglos de emergencia directamente para producción | `hotfix/caida-checkout-stripe` |
-| `refactor/` | Mejoras o limpieza de código sin cambiar funcionalidad | `refactor/modularizar-servicios-api` |
-| `chore/` | Tareas de dependencias, scripts de build o CI/CD | `chore/actualizar-vite-v6` |
-| `docs/` | Cambios únicamente en documentación o README | `docs/actualizar-guia-instalacion` |
+| Prefijo | Base de creación | Destino del PR | Cuándo se usa | Ejemplo |
+| :--- | :--- | :--- | :--- | :--- |
+| `feat/` | `develop` | `develop` | Nuevas características o pantallas | `feat/login-google`, `feat/CART-402-pasarela-pago` |
+| `fix/` | `develop` | `develop` | Corrección de errores en desarrollo | `fix/error-calculo-iva`, `fix/AUTH-105-token-expirado` |
+| `refactor/` | `develop` | `develop` | Mejoras de código sin cambiar funcionalidad | `refactor/modularizar-servicios-api` |
+| `chore/` | `develop` | `develop` | Dependencias, configs, linter o CI/CD | `chore/actualizar-vite-v6` |
+| `hotfix/` | `main` | `main` y `develop` | Emergencias críticas en producción | `hotfix/caida-checkout-stripe` |
+| `release/` | `develop` | `main` y `develop` | Preparación de versión para producción | `release/v1.2.0` |
 
 ---
 
@@ -74,15 +76,15 @@ git config --global rebase.autoStash true
 ---
 
 ### 🟢 3.1. Iniciar una Nueva Tarea
-Antes de comenzar a programar, siempre párate en `main` fresco y actualizado:
+Antes de comenzar a programar, siempre párate en `develop` fresco y actualizado:
 ```bash
-# 1. Cambiar a main
-git checkout main
+# 1. Cambiar a develop
+git checkout develop
 
 # 2. Descargar los últimos cambios del equipo
-git pull origin main
+git pull origin develop
 
-# 3. Crear tu rama con el nombre adecuado
+# 3. Crear tu rama con el nombre adecuado a partir de develop
 git checkout -b feat/nombre-de-tu-tarea
 ```
 
@@ -106,19 +108,19 @@ git commit -m "feat(auth): agregar soporte para inicio de sesion con Google OAut
 
 ---
 
-### 🔄 3.3. Sincronización Diaria con `main` (Evitar Divergencias)
-Si tus compañeros integraron cambios a `main` mientras trabajabas en tu rama:
+### 🔄 3.3. Sincronización Diaria con `develop` (Evitar Divergencias)
+Si tus compañeros integraron cambios a `develop` mientras trabajabas en tu rama:
 
-> ⚠️ **REGLA DE ORO:** NUNCA ejecutes `git merge main` dentro de tu rama de desarrollo. Usa siempre `rebase`.
+> ⚠️ **REGLA DE ORO:** NUNCA ejecutes `git merge develop` dentro de tu rama de desarrollo. Usa siempre `rebase`.
 
 ```bash
-# 1. Descargar lo nuevo de main sin cambiarte de rama
-git fetch origin main
+# 1. Descargar lo nuevo de develop sin cambiarte de rama
+git fetch origin develop
 
-# 2. Re-aplicar tus commits por encima de lo nuevo que entró en main
-git rebase origin/main
+# 2. Re-aplicar tus commits por encima de lo nuevo que entró en develop
+git rebase origin/develop
 ```
-*(Si surge un conflicto, sigue el protocolo de la sección 4).*
+*(Si surge un conflicto, sigue el protocolo de la sección 5).*
 
 ---
 
@@ -138,24 +140,24 @@ git push --force-with-lease origin feat/nombre-de-tu-tarea
 
 ---
 
-### 📋 3.5. Apertura y Revisión de Pull Request (PR)
-1. Ve a GitHub/GitLab y abre el PR hacia `main`.
+### 📋 3.5. Apertura y Revisión de Pull Request (Hacia `develop`)
+1. Ve a GitHub/GitLab y abre el PR teniendo como **base: `develop`** (y no `main`).
 2. Completa la plantilla de PR:
    * **¿Qué hace este cambio?**
    * **¿Cómo se prueba?**
    * **Capturas o evidencia (si aplica UI)**.
-3. Asigna al menos 1 o 2 compañeros de equipo como **Revisores (*Reviewers*)**.
-4. Responde comentarios y sube ajustes a la misma rama si es necesario.
+3. Asigna al menos 1 compañero de equipo como **Revisor (*Reviewer*)**.
+4. Realiza los ajustes necesarios tras la revisión en la misma rama y haz `push`.
 
 ---
 
 ### 🔀 3.6. Fusión (*Merge*) y Limpieza
-* Se realiza la fusión mediante **Squash and Merge** en la interfaz web de GitHub/GitLab.
+* Se realiza la fusión mediante **Squash and Merge** hacia `develop`.
 * Una vez fusionado el PR, elimina la rama tanto en remoto como en local:
 ```bash
-# Regresar a main y actualizar
-git checkout main
-git pull origin main
+# Regresar a develop y actualizar
+git checkout develop
+git pull origin develop
 
 # Eliminar la rama local que ya fue integrada
 git branch -d feat/nombre-de-tu-tarea
@@ -163,15 +165,53 @@ git branch -d feat/nombre-de-tu-tarea
 
 ---
 
-## 4. Protocolo de Resolución de Conflictos con Rebase
+## 4. Paso a Producción: De develop a main y Hotfixes
 
-Los conflictos ocurren cuando dos personas editaron las mismas líneas de un archivo. Con `rebase`, los conflictos se resuelven commit por commit de forma limpia.
+### 4.1. Despliegue de Release a Producción (`develop` ➔ `main`)
+Una vez que el conjunto de cambios en `develop` ha sido probado y verificado en ambiente de staging o pruebas:
+1. Se abre un Pull Request de **`develop` hacia `main`** (Título: `release: versión 1.x.x`).
+2. Se revisa que todos los tests pasen en verde.
+3. Se realiza el merge hacia `main`.
+4. Se crea un Tag de versión en `main`:
+   ```bash
+   git checkout main
+   git pull origin main
+   git tag -a v1.2.0 -m "Release v1.2.0: Login Google y Modulo de Pagos"
+   git push origin v1.2.0
+   ```
+
+### 4.2. Hotfixes de Emergencia (Directo a Producción)
+Si ocurre un bug crítico en producción que no puede esperar al ciclo normal de `develop`:
+```bash
+# 1. Crear rama hotfix desde main
+git checkout main
+git pull origin main
+git checkout -b hotfix/caida-login-produccion
+
+# 2. Corregir y hacer commit
+git commit -m "fix(prod): corregir endpoint caido de autenticacion"
+
+# 3. Subir y abrir PR hacia main
+git push -u origin hotfix/caida-login-produccion
+
+# 4. TRAS EL MERGE EN MAIN: Sincronizar también develop para no perder el fix
+git checkout develop
+git pull origin develop
+git merge main
+git push origin develop
+```
+
+---
+
+## 5. Protocolo de Resolución de Conflictos con Rebase
+
+Los conflictos ocurren cuando dos personas editaron las mismas líneas de un archivo. Con `rebase`, los conflictos se resuelven commit por commit de forma limpia contra `develop`.
 
 ### Procedimiento Paso a Paso:
 
 ```text
-1. git fetch origin main
-2. git rebase origin/main
+1. git fetch origin develop
+2. git rebase origin/develop
       ⬇️
    [¿Hay Conflicto?]
    ├── SI ➔ 1. git status (ver archivos en conflicto)
@@ -191,7 +231,7 @@ Verás archivos con el estado `both modified: src/components/Navbar.tsx`.
 #### 2. Inspeccionar y resolver en el editor
 Abre el archivo con conflicto. Verás los delimitadores de Git:
 ```typescript
-<<<<<<< HEAD (Lo que está actualmente en main)
+<<<<<<< HEAD (Lo que está actualmente en develop)
 export const API_URL = "https://api.v2.empresa.com";
 =======
 export const API_URL = "https://api.v3.empresa.com";
@@ -208,7 +248,6 @@ git add src/components/Navbar.tsx
 # 2. Continuar el proceso de rebase (¡NO ejecutes git commit!)
 git rebase --continue
 ```
-*Si tienes múltiples commits con conflictos, repite estos pasos hasta que la terminal confirme que el rebase ha finalizado exitosamente.*
 
 #### 4. Si te equivocas o necesitas abortar:
 ```bash
@@ -218,31 +257,31 @@ git rebase --abort
 
 ---
 
-## 5. Políticas de Protección del Repositorio
+## 6. Políticas de Protección del Repositorio
 
 Configura las siguientes reglas en tu plataforma de Git (GitHub / GitLab / Bitbucket):
 
-### Reglas para la rama `main`:
-1. ✅ **Prohibir Push Directo**: Nadie puede hacer push directo a `main`.
-2. ✅ **Requerir Pull Request con Aprobación**: Mínimo 1 aprobación requerida para fusionar.
+### Reglas para las ramas `main` y `develop`:
+1. ✅ **Prohibir Push Directo tanto en `main` como en `develop`**: Todo cambio ingresa mediante Pull Request.
+2. ✅ **Requerir Pull Request con Aprobación**: Mínimo 1 aprobación requerida para fusionar a `develop` y a `main`.
 3. ✅ **Descartar Aprobaciones al Recibir Nuevos Commits (*Dismiss stale reviews*)**: Si el autor sube código nuevo tras ser aprobado, requiere nueva revisión.
-4. ✅ **Requerir Verificaciones de Estado (*Require status checks*)**: Linters, pruebas unitarias y TypeScript compilation deben pasar en verde.
-5. ✅ **Requerir que la rama esté al día (*Require branch to be up to date*)**: Evita que se fusionen ramas desactualizadas respecto a `main`.
-6. ✅ **Prohibir Force Push y Deletion**: La rama `main` no puede ser borrada ni sobreescrita.
+4. ✅ **Requerir Verificaciones de Estado (*Require status checks*)**: Linters, pruebas unitarias y compilación de TypeScript deben pasar en verde.
+5. ✅ **Requerir que la rama esté al día (*Require branch to be up to date*)**: Evita fusionar ramas desactualizadas respecto a `develop`.
+6. ✅ **Prohibir Force Push y Deletion**: Ni `main` ni `develop` pueden ser borradas ni sobreescritas.
 
 ---
 
-## 6. Hoja de Referencia Rápida (Cheat Sheet)
+## 7. Hoja de Referencia Rápida (Cheat Sheet)
 
 ### Comandos más utilizados
 
 | Objetivo | Comando |
 | :--- | :--- |
-| **Actualizar `main` local** | `git checkout main && git pull origin main` |
-| **Crear rama de trabajo** | `git checkout -b <prefijo>/<nombre-tarea>` |
+| **Actualizar `develop` local** | `git checkout develop && git pull origin develop` |
+| **Crear rama de trabajo** | `git checkout -b <prefijo>/<nombre-tarea>` (desde `develop`) |
 | **Guardar cambios en commit** | `git add . && git commit -m "<tipo>: <mensaje>"` |
 | **Pausar trabajo temporalmente** | `git stash` (recuperar con `git stash pop`) |
-| **Sincronizar rama con `main`** | `git fetch origin main && git rebase origin/main` |
+| **Sincronizar rama con `develop`** | `git fetch origin develop && git rebase origin/develop` |
 | **Continuar tras resolver conflicto** | `git add <archivo> && git rebase --continue` |
 | **Cancelar un rebase** | `git rebase --abort` |
 | **Subir rama primera vez** | `git push -u origin <nombre-rama>` |
@@ -250,26 +289,33 @@ Configura las siguientes reglas en tu plataforma de Git (GitHub / GitLab / Bitbu
 | **Limpiar ramas remotas borradas** | `git fetch --prune` |
 | **Borrar rama local ya integrada** | `git branch -d <nombre-rama>` |
 
+### Las 5 Reglas de Oro del Equipo
+1. **Nadie programa directamente en `main` ni en `develop`**.
+2. **Las ramas de desarrollo nacen de `develop` y hacen Pull Request hacia `develop`**.
+3. **No uses `git merge develop` en tu rama local; usa siempre `git rebase origin/develop`**.
+4. **`main` solo recibe código probado mediante Release PR desde `develop` o `hotfix/*`**.
+5. **Revisa los Pull Requests de tus compañeros en menos de 24 horas**.
+
 ---
 
-## 7. Caso Práctico Completo de Principio a Fin
+## 8. Caso Práctico Completo de Principio a Fin
 
 A continuación se muestra una simulación real paso a paso de un desarrollador trabajando en equipo:
 
 ### 👤 Escenario:
 * **Desarrollador:** Carlos
 * **Tarea:** Agregar botón de Logout en la barra de navegación.
-* **Situación:** Mientras Carlos programa, su compañera **Ana** fusionó cambios a `main` que modificaron el mismo archivo `Navbar.tsx`.
+* **Situación:** Mientras Carlos programa, su compañera **Ana** fusionó cambios a `develop` que modificaron el mismo archivo `Navbar.tsx`.
 
 ---
 
-### Paso 1: Carlos inicia su tarea
+### Paso 1: Carlos inicia su tarea desde `develop`
 ```bash
-# Carlos se asegura de tener main al día
-git checkout main
-git pull origin main
+# Carlos se asegura de tener develop al día
+git checkout develop
+git pull origin develop
 
-# Carlos crea su rama de trabajo
+# Carlos crea su rama de trabajo a partir de develop
 git checkout -b feat/boton-logout
 ```
 
@@ -285,11 +331,11 @@ git commit -m "feat(nav): agregar boton de cerrar sesion con confirmacion"
 ---
 
 ### Paso 3: Carlos se sincroniza antes de subir cambios
-Mientras Carlos trabajaba, Ana subió un PR que agregó el avatar del usuario en `Navbar.tsx`.
-Carlos sincroniza su rama con lo nuevo de `main`:
+Mientras Carlos trabajaba, Ana subió un PR que agregó el avatar del usuario en `Navbar.tsx` dentro de `develop`.
+Carlos sincroniza su rama con lo nuevo de `develop`:
 ```bash
-git fetch origin main
-git rebase origin/main
+git fetch origin develop
+git rebase origin/develop
 ```
 
 ---
@@ -314,7 +360,7 @@ export function Navbar() {
     <header className="flex justify-between items-center p-4 bg-slate-900 text-white">
       <div className="font-bold text-lg">Mi Aplicación</div>
       <div className="flex items-center gap-3">
-<<<<<<< HEAD (Cambios que subió Ana a main)
+<<<<<<< HEAD (Cambios que subió Ana a develop)
         <span className="text-sm">Ana Gómez</span>
         <img src="/avatar-ana.png" alt="Perfil" className="w-8 h-8 rounded-full" />
 =======
@@ -361,11 +407,12 @@ Successfully rebased and updated refs/heads/feat/boton-logout.
 
 ---
 
-### Paso 7: Carlos sube su rama y abre el Pull Request
+### Paso 7: Carlos sube su rama y abre el Pull Request hacia `develop`
 ```bash
 git push -u origin feat/boton-logout
 ```
 En GitHub, Carlos abre el PR:
+* **Base branch:** `develop` ⬅️ **Compare branch:** `feat/boton-logout`
 * **Título:** `feat(nav): agregar boton de cerrar sesion con confirmacion`
 * **Descripción:**
   > Integra el botón de logout en la barra superior. Se probó la compatibilidad con el avatar de usuario y la redirección al login tras cerrar sesión.
@@ -373,13 +420,19 @@ En GitHub, Carlos abre el PR:
 
 ---
 
-### Paso 8: Fusión y Limpieza
-Ana aprueba el PR y realiza **Squash and Merge**.
+### Paso 8: Fusión en `develop` y Limpieza
+Ana aprueba el PR y realiza **Squash and Merge** hacia `develop`.
 Carlos finaliza limpiando su entorno local:
 ```bash
-git checkout main
-git pull origin main
+git checkout develop
+git pull origin develop
 git branch -d feat/boton-logout
 ```
 
-✅ **Resultado:** El historial de `main` queda completamente limpio y lineal, sin commits de merge accidentales y con cero código perdido.
+---
+
+### Paso 9: Paso a Producción (Cuando esté probado)
+Una vez que el equipo prueba todas las funcionalidades en el entorno de pruebas vinculado a `develop`:
+1. Se abre PR de `develop` hacia `main` (Release).
+2. Se fusiona en `main`.
+3. ¡Se despliega a producción de forma segura y sin sorpresas!
