@@ -1,0 +1,6 @@
+{
+  "name": "Git Team Workflow & Policy Guide",
+  "description": "Interactive reference and official team guide for Git branching strategy, conflict resolution, clean history, and step-by-step repository workflow.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
